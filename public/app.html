@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>sciencelog.ai — Lab Notebook</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#0D9488;--teal-light:#14B8A6;--teal-dark:#0F766E;--teal-50:#F0FDFA;--teal-100:#CCFBF1;
+  --bg:#F8FFFE;--surface:#fff;--text:#134E4A;--muted:#6B8A87;--border:#D1FAE5;
+  --radius:10px;--shadow:0 1px 3px rgba(13,148,136,.08);
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  --mono:'SF Mono',SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh}
+
+/* ── Layout ─────────────────────────────────────────────────────── */
+.app{display:grid;grid-template-columns:240px 1fr;grid-template-rows:56px 1fr;height:100vh;overflow:hidden}
+.sidebar{grid-row:1/3;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:0}
+.topbar{grid-column:2;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px}
+.main{grid-column:2;overflow-y:auto;padding:24px}
+
+/* ── Sidebar ────────────────────────────────────────────────────── */
+.brand{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.brand-dot{width:10px;height:10px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px rgba(13,148,136,.4);animation:pulse 2.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 8px rgba(13,148,136,.4)}50%{opacity:.7;box-shadow:0 0 4px rgba(13,148,136,.2)}}
+.brand h1{font-size:15px;font-weight:700;color:var(--teal)}
+.brand small{font-size:10px;color:var(--muted);margin-left:auto;text-transform:uppercase;letter-spacing:.5px}
+.nav{flex:1;padding:12px 0}
+.nav a{display:flex;align-items:center;gap:10px;padding:10px 20px;color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;transition:all .12s;cursor:pointer;border-left:3px solid transparent}
+.nav a:hover{color:var(--teal);background:var(--teal-50)}
+.nav a.active{color:var(--teal);background:var(--teal-50);border-left-color:var(--teal);font-weight:600}
+.nav a .icon{width:18px;text-align:center;font-size:14px}
+
+/* ── Topbar ─────────────────────────────────────────────────────── */
+.topbar h2{font-size:15px;font-weight:600}
+.topbar .spacer{flex:1}
+.topbar button{padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;transition:all .12s}
+.topbar button:hover{border-color:var(--teal);color:var(--teal)}
+.topbar .btn-primary{background:var(--teal);color:#fff;border-color:var(--teal)}
+.topbar .btn-primary:hover{background:var(--teal-dark)}
+
+/* ── Panels ─────────────────────────────────────────────────────── */
+.panel{display:none}
+.panel.active{display:block}
+
+/* ── Cards ──────────────────────────────────────────────────────── */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:transform .12s,box-shadow .12s}
+.card:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(13,148,136,.1)}
+.card h3{font-size:15px;font-weight:600;margin-bottom:6px}
+.card p{font-size:13px;color:var(--muted);line-height:1.5}
+.card .meta{margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* ── Badges ─────────────────────────────────────────────────────── */
+.badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.badge-planned{background:#E0F2FE;color:#0369A1}
+.badge-running{background:#FEF3C7;color:#92400E}
+.badge-completed{background:#D1FAE5;color:#065F46}
+.badge-failed{background:#FEE2E2;color:#991B1B}
+.badge-paused{background:#F3F4F6;color:#4B5563}
+.badge-active{background:#D1FAE5;color:#065F46}
+.badge-testing{background:#FEF3C7;color:#92400E}
+.badge-supported{background:#0D9488;color:#fff}
+.badge-refuted{background:#FEE2E2;color:#991B1B}
+.badge-tag{background:var(--teal-100);color:var(--teal-dark)}
+
+/* ── Forms ──────────────────────────────────────────────────────── */
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border);font-family:var(--font);font-size:14px;color:var(--text);background:var(--surface);outline:none;transition:border-color .12s}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--teal)}
+.form-group textarea{resize:vertical;min-height:80px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ── Modal ──────────────────────────────────────────────────────── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:100;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border-radius:14px;padding:28px;width:90%;max-width:560px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.modal h2{font-size:18px;font-weight:700;margin-bottom:20px;color:var(--teal)}
+.modal .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px}
+.modal .actions button{padding:10px 22px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text)}
+.modal .actions .save{background:var(--teal);color:#fff;border-color:var(--teal)}
+
+/* ── Chat ───────────────────────────────────────────────────────── */
+.chat-layout{display:grid;grid-template-rows:1fr auto;height:calc(100vh - 104px)}
+.chat-messages{overflow-y:auto;padding:4px 0}
+.chat-msg{margin-bottom:16px;max-width:680px;animation:fadeIn .15s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.chat-msg.user{margin-left:auto;text-align:right}
+.chat-msg .role-label{font-size:10px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px}
+.chat-msg .bubble{padding:12px 16px;border-radius:12px;line-height:1.6;font-size:14px;white-space:pre-wrap;word-break:break-word}
+.chat-msg.user .bubble{background:var(--teal);color:#fff;border-bottom-right-radius:4px;display:inline-block;text-align:left}
+.chat-msg.assistant .bubble{background:var(--surface);border:1px solid var(--border);border-bottom-left-radius:4px}
+.chat-input{display:flex;gap:10px;padding-top:16px;border-top:1px solid var(--border)}
+.chat-input input{flex:1;padding:12px 16px;border-radius:10px;border:1px solid var(--border);font-size:14px;font-family:var(--font);outline:none}
+.chat-input input:focus{border-color:var(--teal)}
+.chat-input button{padding:12px 24px;border-radius:10px;background:var(--teal);color:#fff;border:none;font-weight:600;font-size:13px;cursor:pointer}
+.chat-input button:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── Timeline ───────────────────────────────────────────────────── */
+.timeline{position:relative;padding-left:28px}
+.timeline::before{content:'';position:absolute;left:10px;top:0;bottom:0;width:2px;background:var(--border)}
+.timeline-item{position:relative;margin-bottom:20px}
+.timeline-item::before{content:'';position:absolute;left:-22px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--teal);border:2px solid var(--surface);box-shadow:0 0 0 2px var(--teal)}
+.timeline-item.refuted::before{background:#EF4444;box-shadow:0 0 0 2px #EF4444}
+.timeline-item .ts{font-size:11px;color:var(--muted);margin-bottom:4px}
+
+/* ── Observation list ───────────────────────────────────────────── */
+.obs-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.obs-item .obs-date{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.obs-item .obs-what{font-size:14px;font-weight:600;margin:4px 0}
+.obs-item .obs-notes{font-size:13px;color:var(--muted);line-height:1.5}
+
+/* ── Empty state ────────────────────────────────────────────────── */
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty .icon{font-size:40px;margin-bottom:12px;opacity:.5}
+.empty p{font-size:14px}
+
+/* ── Literature result ──────────────────────────────────────────── */
+.lit-result{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px}
+.lit-result h3{font-size:16px;font-weight:700;color:var(--teal);margin-bottom:8px}
+.lit-result .section{margin-top:12px}
+.lit-result .section h4{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px}
+.lit-result .section ul{list-style:none;padding:0}
+.lit-result .section li{font-size:13px;padding:4px 0;padding-left:16px;position:relative}
+.lit-result .section li::before{content:'';position:absolute;left:0;top:11px;width:6px;height:6px;border-radius:50%;background:var(--teal-light)}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="brand">
+      <div class="brand-dot"></div>
+      <h1>sciencelog<span>.ai</span></h1>
+      <small>lab</small>
+    </div>
+    <nav class="nav">
+      <a class="active" onclick="showPanel('experiments')" id="nav-experiments">
+        <span class="icon">&#128300;</span> Experiments
+      </a>
+      <a onclick="showPanel('hypotheses')" id="nav-hypotheses">
+        <span class="icon">&#128161;</span> Hypotheses
+      </a>
+      <a onclick="showPanel('observations')" id="nav-observations">
+        <span class="icon">&#128065;</span> Observations
+      </a>
+      <a onclick="showPanel('chat')" id="nav-chat">
+        <span class="icon">&#128172;</span> Chat
+      </a>
+      <a onclick="showPanel('literature')" id="nav-literature">
+        <span class="icon">&#128214;</span> Literature
+      </a>
+    </nav>
+  </div>
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <h2 id="topbar-title">Experiments</h2>
+    <div class="spacer"></div>
+    <button class="btn-primary" id="topbar-action" onclick="openCreateModal()">+ New Experiment</button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+
+    <!-- Experiments Panel -->
+    <div class="panel active" id="panel-experiments">
+      <div class="card-grid" id="experiments-list"></div>
+      <div class="empty" id="experiments-empty">
+        <div class="icon">&#128300;</div>
+        <p>No experiments yet. Start your first experiment.</p>
+      </div>
+    </div>
+
+    <!-- Hypotheses Panel -->
+    <div class="panel" id="panel-hypotheses">
+      <div class="card-grid" id="hypotheses-list"></div>
+      <div class="timeline" id="hypotheses-timeline"></div>
+      <div class="empty" id="hypotheses-empty">
+        <div class="icon">&#128161;</div>
+        <p>No hypotheses tracked yet.</p>
+      </div>
+    </div>
+
+    <!-- Observations Panel -->
+    <div class="panel" id="panel-observations">
+      <div id="observations-list"></div>
+      <div class="empty" id="observations-empty">
+        <div class="icon">&#128065;</div>
+        <p>No observations logged yet.</p>
+      </div>
+    </div>
+
+    <!-- Chat Panel -->
+    <div class="panel" id="panel-chat">
+      <div class="chat-layout">
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input">
+          <input id="chat-input" placeholder="Ask about your experiments, data, or hypotheses..." autocomplete="off">
+          <button id="chat-send" onclick="sendChat()">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Literature Panel -->
+    <div class="panel" id="panel-literature">
+      <div style="display:flex;gap:10px;margin-bottom:20px">
+        <input id="lit-topic" placeholder="Enter a research topic..." style="flex:1;padding:12px 16px;border-radius:10px;border:1px solid var(--border);font-size:14px;outline:none">
+        <button class="btn-primary" style="padding:12px 24px;border-radius:10px;background:var(--teal);color:#fff;border:none;font-weight:600;font-size:13px;cursor:pointer" onclick="searchLiterature()">Search</button>
+      </div>
+      <div id="literature-results"></div>
+      <div class="empty" id="literature-empty">
+        <div class="icon">&#128214;</div>
+        <p>Search for a research topic to get an AI-generated summary.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Create Experiment Modal -->
+<div class="modal-overlay" id="modal-experiment">
+  <div class="modal">
+    <h2>New Experiment</h2>
+    <div class="form-group">
+      <label>Title</label>
+      <input id="exp-title" placeholder="e.g. Effect of pH on enzyme activity">
+    </div>
+    <div class="form-group">
+      <label>Hypothesis</label>
+      <textarea id="exp-hypothesis" placeholder="What do you expect to happen?"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Method</label>
+      <textarea id="exp-method" placeholder="Describe your experimental method..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Tags (comma-separated)</label>
+      <input id="exp-tags" placeholder="e.g. biochemistry, enzymes, pH">
+    </div>
+    <div class="actions">
+      <button onclick="closeModal('modal-experiment')">Cancel</button>
+      <button class="save" onclick="createExperiment()">Create Experiment</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create Observation Modal -->
+<div class="modal-overlay" id="modal-observation">
+  <div class="modal">
+    <h2>Log Observation</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="obs-date">
+      </div>
+      <div class="form-group">
+        <label>Experiment (optional)</label>
+        <select id="obs-experiment"><option value="">-- none --</option></select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>What happened</label>
+      <input id="obs-what" placeholder="Brief description of what you observed">
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea id="obs-notes" placeholder="Additional details, context, measurements..."></textarea>
+    </div>
+    <div class="actions">
+      <button onclick="closeModal('modal-observation')">Cancel</button>
+      <button class="save" onclick="createObservation()">Log Observation</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create Hypothesis Modal -->
+<div class="modal-overlay" id="modal-hypothesis">
+  <div class="modal">
+    <h2>New Hypothesis</h2>
+    <div class="form-group">
+      <label>Statement</label>
+      <textarea id="hyp-statement" placeholder="State your hypothesis clearly and testably..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Initial Status</label>
+      <select id="hyp-status">
+        <option value="active">Active</option>
+        <option value="testing">Testing</option>
+      </select>
+    </div>
+    <div class="actions">
+      <button onclick="closeModal('modal-hypothesis')">Cancel</button>
+      <button class="save" onclick="createHypothesis()">Add Hypothesis</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── State ──────────────────────────────────────────────────────────────────
+let currentPanel = 'experiments';
+let chatBusy = false;
+
+// ─── Navigation ─────────────────────────────────────────────────────────────
+function showPanel(name) {
+  currentPanel = name;
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById('panel-' + name)?.classList.add('active');
+  document.getElementById('nav-' + name)?.classList.add('active');
+
+  const titles = { experiments:'Experiments', hypotheses:'Hypotheses', observations:'Observations', chat:'AI Chat', literature:'Literature Search' };
+  const actions = { experiments:'+ New Experiment', hypotheses:'+ New Hypothesis', observations:'+ Log Observation', chat:'', literature:'' };
+  document.getElementById('topbar-title').textContent = titles[name] || '';
+  const btn = document.getElementById('topbar-action');
+  btn.textContent = actions[name] || '';
+  btn.style.display = actions[name] ? '' : 'none';
+
+  if (name === 'experiments') loadExperiments();
+  if (name === 'hypotheses') loadHypotheses();
+  if (name === 'observations') loadObservations();
+}
+
+// ─── Modal helpers ──────────────────────────────────────────────────────────
+function openCreateModal() {
+  if (currentPanel === 'experiments') openModal('modal-experiment');
+  if (currentPanel === 'hypotheses') openModal('modal-hypothesis');
+  if (currentPanel === 'observations') { populateExperimentSelect(); openModal('modal-observation'); }
+}
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// ─── API helpers ────────────────────────────────────────────────────────────
+async function api(path, opts = {}) {
+  const res = await fetch('/api/' + path, {
+    headers: { 'Content-Type': 'application/json' },
+    ...opts,
+  });
+  return res.json();
+}
+
+// ─── Experiments ────────────────────────────────────────────────────────────
+async function loadExperiments() {
+  const list = await api('experiments');
+  const container = document.getElementById('experiments-list');
+  const empty = document.getElementById('experiments-empty');
+  if (!list.length) { container.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+  container.innerHTML = list.map(e => `
+    <div class="card">
+      <h3>${esc(e.title)}</h3>
+      <p>${esc(e.hypothesis || 'No hypothesis')}</p>
+      <div class="meta">
+        <span class="badge badge-${e.status}">${e.status}</span>
+        ${e.tags.map(t => `<span class="badge badge-tag">${esc(t)}</span>`).join('')}
+        <span style="margin-left:auto;font-size:11px;color:var(--muted)">${new Date(e.createdAt).toLocaleDateString()}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function createExperiment() {
+  const title = document.getElementById('exp-title').value.trim();
+  if (!title) return;
+  await api('experiments', {
+    method: 'POST',
+    body: JSON.stringify({
+      title,
+      hypothesis: document.getElementById('exp-hypothesis').value.trim(),
+      method: document.getElementById('exp-method').value.trim(),
+      tags: document.getElementById('exp-tags').value.split(',').map(t => t.trim()).filter(Boolean),
+    }),
+  });
+  closeModal('modal-experiment');
+  document.getElementById('exp-title').value = '';
+  document.getElementById('exp-hypothesis').value = '';
+  document.getElementById('exp-method').value = '';
+  document.getElementById('exp-tags').value = '';
+  loadExperiments();
+}
+
+// ─── Hypotheses ─────────────────────────────────────────────────────────────
+async function loadHypotheses() {
+  const list = await api('hypotheses');
+  const container = document.getElementById('hypotheses-list');
+  const timeline = document.getElementById('hypotheses-timeline');
+  const empty = document.getElementById('hypotheses-empty');
+  if (!list.length) { container.innerHTML = ''; timeline.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+
+  container.innerHTML = list.map(h => `
+    <div class="card">
+      <h3>${esc(h.statement)}</h3>
+      <p>${h.evidence.length} evidence items, ${h.experimentIds.length} linked experiments</p>
+      <div class="meta">
+        <span class="badge badge-${h.status}">${h.status}</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--muted)">${new Date(h.updatedAt).toLocaleDateString()}</span>
+      </div>
+    </div>
+  `).join('');
+
+  timeline.innerHTML = '<h3 style="margin-bottom:16px;font-size:14px">Evolution Timeline</h3>' +
+    list.map(h => `
+      <div class="timeline-item ${h.status === 'refuted' ? 'refuted' : ''}">
+        <div class="ts">${new Date(h.createdAt).toLocaleDateString()} &middot; ${new Date(h.updatedAt).toLocaleDateString()}</div>
+        <div><strong>${esc(h.statement)}</strong> <span class="badge badge-${h.status}" style="margin-left:6px">${h.status}</span></div>
+      </div>
+    `).join('');
+}
+
+async function createHypothesis() {
+  const statement = document.getElementById('hyp-statement').value.trim();
+  if (!statement) return;
+  await api('hypotheses', {
+    method: 'POST',
+    body: JSON.stringify({
+      statement,
+      status: document.getElementById('hyp-status').value,
+    }),
+  });
+  closeModal('modal-hypothesis');
+  document.getElementById('hyp-statement').value = '';
+  loadHypotheses();
+}
+
+// ─── Observations ───────────────────────────────────────────────────────────
+async function loadObservations() {
+  const list = await api('observations');
+  const container = document.getElementById('observations-list');
+  const empty = document.getElementById('observations-empty');
+  if (!list.length) { container.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+  container.innerHTML = list.map(o => `
+    <div class="obs-item">
+      <div class="obs-date">${o.date} ${o.experimentId ? '&middot; linked to experiment' : ''}</div>
+      <div class="obs-what">${esc(o.what)}</div>
+      ${o.notes ? `<div class="obs-notes">${esc(o.notes)}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+async function populateExperimentSelect() {
+  const list = await api('experiments');
+  const sel = document.getElementById('obs-experiment');
+  sel.innerHTML = '<option value="">-- none --</option>' +
+    list.map(e => `<option value="${e.id}">${esc(e.title)}</option>`).join('');
+  document.getElementById('obs-date').value = new Date().toISOString().split('T')[0];
+}
+
+async function createObservation() {
+  const what = document.getElementById('obs-what').value.trim();
+  if (!what) return;
+  await api('observations', {
+    method: 'POST',
+    body: JSON.stringify({
+      date: document.getElementById('obs-date').value,
+      what,
+      notes: document.getElementById('obs-notes').value.trim(),
+      experimentId: document.getElementById('obs-experiment').value || undefined,
+    }),
+  });
+  closeModal('modal-observation');
+  document.getElementById('obs-what').value = '';
+  document.getElementById('obs-notes').value = '';
+  loadObservations();
+}
+
+// ─── Chat ───────────────────────────────────────────────────────────────────
+function addChatMsg(role, text) {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg ' + role;
+  div.innerHTML = `<div class="role-label">${role}</div><div class="bubble">${esc(text)}</div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return div;
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text || chatBusy) return;
+  input.value = '';
+  chatBusy = true;
+  document.getElementById('chat-send').disabled = true;
+  addChatMsg('user', text);
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text }),
+    });
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let full = '', msgDiv = null;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = dec.decode(value, { stream: true });
+      for (const line of chunk.split('\n')) {
+        if (!line.startsWith('data: ')) continue;
+        const p = line.slice(6).trim();
+        if (p === '[DONE]') break;
+        try {
+          const d = JSON.parse(p);
+          if (d.content) {
+            full += d.content;
+            if (!msgDiv) msgDiv = addChatMsg('assistant', '');
+            msgDiv.querySelector('.bubble').textContent = full;
+            document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+          }
+          if (d.error) { addChatMsg('assistant', 'Error: ' + d.error); break; }
+        } catch {}
+      }
+    }
+    if (!full && !msgDiv) addChatMsg('assistant', '(no response)');
+  } catch (e) {
+    addChatMsg('assistant', 'Error: ' + e.message);
+  }
+  chatBusy = false;
+  document.getElementById('chat-send').disabled = false;
+  document.getElementById('chat-input').focus();
+}
+
+document.getElementById('chat-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+});
+
+// ─── Literature ─────────────────────────────────────────────────────────────
+async function searchLiterature() {
+  const topic = document.getElementById('lit-topic').value.trim();
+  if (!topic) return;
+  const empty = document.getElementById('literature-empty');
+  const results = document.getElementById('literature-results');
+  empty.style.display = 'none';
+  results.innerHTML = '<div class="empty"><p>Searching literature...</p></div>';
+
+  try {
+    const res = await fetch('/api/literature?topic=' + encodeURIComponent(topic));
+    const data = await res.json();
+    results.innerHTML = `
+      <div class="lit-result">
+        <h3>${esc(data.topic || topic)}</h3>
+        <p>${esc(data.summary || '')}</p>
+        ${data.keyPoints?.length ? `<div class="section"><h4>Key Points</h4><ul>${data.keyPoints.map(p => `<li>${esc(p)}</li>`).join('')}</ul></div>` : ''}
+        ${data.gaps?.length ? `<div class="section"><h4>Research Gaps</h4><ul>${data.gaps.map(g => `<li>${esc(g)}</li>`).join('')}</ul></div>` : ''}
+        ${data.suggestedReading?.length ? `<div class="section"><h4>Suggested Reading</h4><ul>${data.suggestedReading.map(r => `<li>${esc(r)}</li>`).join('')}</ul></div>` : ''}
+      </div>
+    `;
+  } catch (e) {
+    results.innerHTML = `<div class="empty"><p>Error: ${e.message}</p></div>`;
+  }
+}
+
+document.getElementById('lit-topic').addEventListener('keydown', e => {
+  if (e.key === 'Enter') searchLiterature();
+});
+
+// ─── Utility ────────────────────────────────────────────────────────────────
+function esc(t) {
+  if (!t) return '';
+  const d = document.createElement('div');
+  d.textContent = t;
+  return d.innerHTML;
+}
+
+// ─── Init ───────────────────────────────────────────────────────────────────
+loadExperiments();
+</script>
+</body>
+</html>
