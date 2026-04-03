@@ -8,7 +8,7 @@ MODEL = "deepseek-chat"
 
 [[kv_namespaces]]
 binding = "STORAGE"
-id = "placeholder-kv-id"
+id = "5247e215f9214855a0034b26ed3033fe"
 
 [[kv_namespaces]]
 binding = "KG"
