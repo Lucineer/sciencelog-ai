@@ -9,3 +9,7 @@ MODEL = "deepseek-chat"
 [[kv_namespaces]]
 binding = "STORAGE"
 id = "placeholder-kv-id"
+
+[[kv_namespaces]]
+binding = "KG"
+id = "c7886204c80845c6b9568693ed277b75"
