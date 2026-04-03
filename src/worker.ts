@@ -476,6 +476,8 @@ export default {
 
     // ── Status ──────────────────────────────────────────────────────────────
     if (method === 'GET' && path === '/api/status') {
+
+  if (path === '/api/efficiency' && request.method === 'GET') {    return new Response(JSON.stringify({ totalCached: 0, totalHits: 0, cacheHitRate: 0, tokensSaved: 0, repo: 'sciencelog-ai', timestamp: Date.now() }), { headers: { 'Content-Type': 'application/json', ...corsHeaders() } });  }
       const tracker = await loadTracker(env.STORAGE);
       const obs = await loadObservations(env.STORAGE);
       const hyp = await loadHypotheses(env.STORAGE);
