@@ -1,5 +1,5 @@
-account_id = "2bd99d5b13b2186382cd3dc995b0bb18"
 name = "sciencelog-ai"
+account_id = "049ff5e84ecf636b53b162cbb580aae6"
 main = "src/worker.ts"
 compatibility_date = "2024-05-29"
 
@@ -9,8 +9,8 @@ MODEL = "deepseek-chat"
 
 [[kv_namespaces]]
 binding = "STORAGE"
-id = "5247e215f9214855a0034b26ed3033fe"
+id = "a65f67bcde704f8eba74285bf6f1635a"
 
 [[kv_namespaces]]
 binding = "KG"
-id = "c7886204c80845c6b9568693ed277b75"
+id = "a65f67bcde704f8eba74285bf6f1635a"

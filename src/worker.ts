@@ -206,7 +206,9 @@ function landingHTML(): string {
 <body>
 <div class="container">
   <header>
-    <h1>science<span>log</span>.ai</h1>
+    
+      <img src="https://cocapn-logos.casey-digennaro.workers.dev/img/cocapn-logo-v1.png" alt="Cocapn" style="width:64px;height:auto;margin-bottom:.5rem;border-radius:8px;display:block;margin-left:auto;margin-right:auto">
+      <h1>science<span>log</span>.ai</h1>
     <p>A lab notebook that thinks. AI-powered experiment tracking for scientists and researchers.</p>
   </header>
   <div class="grid">
