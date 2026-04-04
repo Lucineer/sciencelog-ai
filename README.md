@@ -1,81 +1,59 @@
-# sciencelog.ai
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Lucineer/capitaine/master/docs/capitaine-logo.jpg" alt="Capitaine" width="120">
+</p>
 
-A lab notebook that thinks. AI-powered experiment tracking for scientists and researchers.
+<h1 align="center">sciencelog-ai</h1>
 
-Built on [Cloudflare Workers](https://workers.cloudflare.com/) with [DeepSeek](https://deepseek.com/) for AI inference.
+<p align="center">Science companion — AI-powered research and learning.</p>
 
-## Features
+---
 
-- **Experiment Tracker** — Full lifecycle from hypothesis to conclusion, with status badges, result analysis, and reproduction guides
-- **Hypothesis Tracker** — Track hypothesis evolution over time with evidence linking and status changes
-- **Observation Log** — Timestamped observations with optional experiment linking
-- **AI Chat** — Ask questions about your data with streaming responses. "What variables might explain this anomaly?"
-- **Literature Search** — AI-generated summaries of research topics with gap analysis
-- **Experimental Design** — AI-suggested methods, variables, and controls
-- **Data Interpretation** — Help analyzing results with pattern detection
-- **Citation Manager** — Track references with APA/MLA/Chicago formatting
+**Vessel stub** · Needs `worker.ts` to deploy · Part of the [Lucineer fleet](https://github.com/orgs/Lucineer/repositories)
 
-## API
+## Status
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/chat` | AI chat (SSE streaming) |
-| `GET/POST` | `/api/experiments` | List / create experiments |
-| `GET/PUT/DELETE` | `/api/experiments/:id` | Read / update / delete experiment |
-| `GET` | `/api/experiments/:id?action=analyze` | Result analysis |
-| `GET` | `/api/experiments/:id?action=reproduce` | Reproduction guide |
-| `GET/POST` | `/api/observations` | List / create observations |
-| `GET/POST` | `/api/hypotheses` | List / create hypotheses |
-| `GET/PUT/DELETE` | `/api/hypotheses/:id` | Read / update / delete hypothesis |
-| `GET` | `/api/literature?topic=...` | AI literature summary |
-| `POST` | `/api/interpret` | AI data interpretation |
-| `POST` | `/api/design` | AI experimental design |
-| `POST` | `/api/hypothesize` | AI hypothesis generation |
-| `GET` | `/api/status` | System status |
-| `GET` | `/` | Landing page |
+🟡 Hull not yet deployed. Fork and add a `worker.ts` to bring this vessel online.
 
-## Setup
+## The Fleet
 
-```bash
-# Install dependencies
-npm install
 
-# Set your API key
-npx wrangler secret put DEEPSEEK_API_KEY
+<details>
+<summary><strong>⚓ The Fleet</strong></summary>
 
-# Run locally
-npm run dev
+**Flagship vessels**
 
-# Deploy
-npm run deploy
-```
+- [cocapn.ai](https://github.com/Lucineer/capitaine)
+- [personallog.ai](https://github.com/Lucineer/personallog-ai)
+- [businesslog.ai](https://github.com/Lucineer/businesslog-ai)
+- [studylog.ai](https://github.com/Lucineer/studylog-ai)
+- [makerlog.ai](https://github.com/Lucineer/makerlog-ai)
+- [playerlog.ai](https://github.com/Lucineer/playerlog-ai)
+- [dmlog.ai](https://github.com/Lucineer/dmlog-ai)
+- [reallog.ai](https://github.com/Lucineer/reallog-ai)
+- [deckboss.ai](https://github.com/Lucineer/deckboss-ai)
 
-## Architecture
+**Fleet services**
 
-```
-src/
-  worker.ts              # Cloudflare Worker — routing, SSE streaming, landing page
-  experiments/
-    tracker.ts           # Experiment, Observation, Hypothesis CRUD + search + analysis
-  research/
-    assistant.ts         # Literature summary, hypothesis gen, experimental design, citations
-    llm.ts               # Multi-provider LLM client (DeepSeek, OpenAI)
-public/
-  app.html               # Teal/white lab UI — experiments, hypotheses, chat, literature
-```
+- [Fleet Catalog](https://github.com/Lucineer/capitaine/blob/master/docs/fleet/FLEET.md)
+- [Git Agent (full)](https://github.com/Lucineer/git-agent)
+- [Cocapn Lite (minimal)](https://github.com/Lucineer/cocapn-lite)
+- [Fleet Orchestrator](https://github.com/Lucineer/fleet-orchestrator)
+- [Dead Reckoning Engine](https://github.com/Lucineer/dead-reckoning-engine)
+- [Dream Engine](https://github.com/Lucineer/dream-engine)
+- [Seed UI (5 layers)](https://github.com/Lucineer/seed-ui)
 
-## Configuration
+**For power users**
 
-Set via `wrangler.toml` or environment variables:
+- [Cocapn Lite (tabula rasa)](https://github.com/Lucineer/cocapn-lite)
+- [Cocapn (core platform)](https://github.com/Lucineer/cocapn)
+- [ZeroClaw (framework)](https://github.com/Lucineer/zeroclaw)
 
-- `PROVIDER` — `deepseek` (default) or `openai`
-- `MODEL` — Model name (default: `deepseek-chat`)
-- `DEEPSEEK_API_KEY` — API key (set via `wrangler secret put`)
+[View all 106 repos →](https://github.com/orgs/Lucineer/repositories)
+[Fleet manifest →](https://github.com/Lucineer/capitaine/blob/master/docs/fleet/FLEET.md)
+
+</details>
+
 
 ## License
 
-MIT
-
-## License
-
-MIT — Built with ❤️ by [Superinstance](https://github.com/superinstance) & [Lucineer](https://github.com/Lucineer) (DiGennaro et al.)
+MIT · Superinstance & Lucineer (DiGennaro et al.)
