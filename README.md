@@ -1,59 +1,51 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/Lucineer/capitaine/master/docs/capitaine-logo.jpg" alt="Capitaine" width="120">
-</p>
+# sciencelog-ai
+🔬 An AI-assisted log for scientific work. Track papers, experiments, and notes in one place.
 
-<h1 align="center">sciencelog-ai</h1>
+You read a paper, run an experiment, and take notes. This tool helps you connect them so you can find what you need later.
 
-<p align="center">Science companion — AI-powered research and learning.</p>
+**Live URL:** https://sciencelog-ai.casey-digennaro.workers.dev
 
 ---
 
-**Vessel stub** · Needs `worker.ts` to deploy · Part of the [Lucineer fleet](https://github.com/orgs/Lucineer/repositories)
+## Why it exists
+Research tools often impose rigid structures. AI notetakers can produce outputs that aren't useful for actual experimental work. This is a simple, self-contained tool that helps you link your work without getting in your way.
 
-## Status
+## What it provides
+- **You own your data:** No accounts or telemetry. You deploy it. Your data stays in your worker.
+- **One Cloudflare Worker:** Zero runtime dependencies. No database or external services required.
+- **Structured for work:** Summaries and logs are formatted for practical use.
+- **Part of the Fleet:** A native Cocapn Fleet agent. Connect it to other fleet tools or extend its functionality.
 
-🟡 Hull not yet deployed. Fork and add a `worker.ts` to bring this vessel online.
+---
 
-## The Fleet
+## Quick Start
+1.  **Fork this repository.** The project is designed to be forked and owned by you.
+2.  Deploy to Cloudflare Workers using `wrangler deploy`.
+3.  Add your LLM API key as a worker secret.
 
+## Core Features
+- **Paper Summaries:** Upload a PDF or provide an ArXiv/DOI link. Get a structured summary including key findings and cited follow-up work.
+- **Experiment Logging:** Log your setup, parameters, and results. Entries are timestamped.
+- **Note Management:** Write research notes and connect them to related papers or experiments.
+- **Connection Tracking:** Entries can be linked manually, helping you see relationships in your work.
 
-<details>
-<summary><strong>⚓ The Fleet</strong></summary>
+## Bring Your Own Keys
+Set an `OPENAI_API_KEY` or compatible key via `wrangler secret put`. The model interface is modular and can be swapped.
 
-**Flagship vessels**
+## An Honest Limitation
+This is a self-hosted tool. Setup and maintenance—like managing your API key and deploying updates—is your responsibility. The AI's output quality depends on the model you configure.
 
-- [cocapn.ai](https://github.com/Lucineer/capitaine)
-- [personallog.ai](https://github.com/Lucineer/personallog-ai)
-- [businesslog.ai](https://github.com/Lucineer/businesslog-ai)
-- [studylog.ai](https://github.com/Lucineer/studylog-ai)
-- [makerlog.ai](https://github.com/Lucineer/makerlog-ai)
-- [playerlog.ai](https://github.com/Lucineer/playerlog-ai)
-- [dmlog.ai](https://github.com/Lucineer/dmlog-ai)
-- [reallog.ai](https://github.com/Lucineer/reallog-ai)
-- [deckboss.ai](https://github.com/Lucineer/deckboss-ai)
-
-**Fleet services**
-
-- [Fleet Catalog](https://github.com/Lucineer/capitaine/blob/master/docs/fleet/FLEET.md)
-- [Git Agent (full)](https://github.com/Lucineer/git-agent)
-- [Cocapn Lite (minimal)](https://github.com/Lucineer/cocapn-lite)
-- [Fleet Orchestrator](https://github.com/Lucineer/fleet-orchestrator)
-- [Dead Reckoning Engine](https://github.com/Lucineer/dead-reckoning-engine)
-- [Dream Engine](https://github.com/Lucineer/dream-engine)
-- [Seed UI (5 layers)](https://github.com/Lucineer/seed-ui)
-
-**For power users**
-
-- [Cocapn Lite (tabula rasa)](https://github.com/Lucineer/cocapn-lite)
-- [Cocapn (core platform)](https://github.com/Lucineer/cocapn)
-- [ZeroClaw (framework)](https://github.com/Lucineer/zeroclaw)
-
-[View all 106 repos →](https://github.com/orgs/Lucineer/repositories)
-[Fleet manifest →](https://github.com/Lucineer/capitaine/blob/master/docs/fleet/FLEET.md)
-
-</details>
-
+## Contributing
+This is an open-source vessel in the Cocapn Fleet. The philosophy is fork-first: adapt it for your lab. Pull requests for clear improvements are welcome.
 
 ## License
+MIT License.
 
-MIT · Superinstance & Lucineer (DiGennaro et al.)
+Superinstance & Lucineer (DiGennaro et al.).
+
+---
+
+<div align="center">
+  <a href="https://the-fleet.casey-digennaro.workers.dev">The Fleet</a> • 
+  <a href="https://cocapn.ai">Cocapn</a>
+</div>
