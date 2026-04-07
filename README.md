@@ -1,51 +1,42 @@
-# sciencelog-ai
-🔬 An AI-assisted log for scientific work. Track papers, experiments, and notes in one place.
+# sciencelog-ai 📓
 
-You read a paper, run an experiment, and take notes. This tool helps you connect them so you can find what you need later.
+A tool that helps you keep track of papers and experiments. Paste an ArXiv link or drop a PDF to get structured summaries and maintain a permanent, private log for your research. It runs on your own Cloudflare Worker. No accounts, no external servers.
 
-**Live URL:** https://sciencelog-ai.casey-digennaro.workers.dev
+**Live Instance:** https://sciencelog-ai.casey-digennaro.workers.dev
 
----
-
-## Why it exists
-Research tools often impose rigid structures. AI notetakers can produce outputs that aren't useful for actual experimental work. This is a simple, self-contained tool that helps you link your work without getting in your way.
-
-## What it provides
-- **You own your data:** No accounts or telemetry. You deploy it. Your data stays in your worker.
-- **One Cloudflare Worker:** Zero runtime dependencies. No database or external services required.
-- **Structured for work:** Summaries and logs are formatted for practical use.
-- **Part of the Fleet:** A native Cocapn Fleet agent. Connect it to other fleet tools or extend its functionality.
-
----
+## Why This Exists
+Most research tools are either locked into a platform or overloaded with features. This is built for the working process: capturing notes on papers and experiment parameters without trusting a third party with your unfinished work.
 
 ## Quick Start
-1.  **Fork this repository.** The project is designed to be forked and owned by you.
-2.  Deploy to Cloudflare Workers using `wrangler deploy`.
-3.  Add your LLM API key as a worker secret.
+1.  **Fork this repository.** The project is designed to be forked first.
+2.  **Deploy** to Cloudflare Workers using `wrangler deploy`.
+3.  **Add your LLM API key** once as a worker secret. No other setup is required.
 
-## Core Features
-- **Paper Summaries:** Upload a PDF or provide an ArXiv/DOI link. Get a structured summary including key findings and cited follow-up work.
-- **Experiment Logging:** Log your setup, parameters, and results. Entries are timestamped.
-- **Note Management:** Write research notes and connect them to related papers or experiments.
-- **Connection Tracking:** Entries can be linked manually, helping you see relationships in your work.
+## Features
+*   **Structured Paper Summaries:** Extracts title, authors, key points, methodology, and cited follow-up work.
+*   **Experiment Logging:** Timestamped logs for test parameters and results.
+*   **Linked Notes:** Connect your thoughts directly to a source paper or log entry.
+*   **Private Operation:** No telemetry or external analytics. Data stays in your Worker and connected KV store.
+*   **LLM Flexibility:** Configure it for OpenAI, Anthropic, Ollama, or any compatible API endpoint.
+*   **Fleet Native:** Designed to connect with other Cocapn Fleet tools.
 
-## Bring Your Own Keys
-Set an `OPENAI_API_KEY` or compatible key via `wrangler secret put`. The model interface is modular and can be swapped.
+## What Makes This Different
+*   **You Deploy and Control It.** This is not a SaaS. You run the entire instance, so there is no central service to sunset or monitor your data.
+*   **Zero Runtime Dependencies.** The Worker is a single, self-contained codebase without external npm packages, minimizing maintenance.
+*   **Fork-First Philosophy.** You are expected to clone and modify this for your own use. You do not need to contribute back or ask for permission.
 
-## An Honest Limitation
-This is a self-hosted tool. Setup and maintenance—like managing your API key and deploying updates—is your responsibility. The AI's output quality depends on the model you configure.
+## Setup
+Set an `OPENAI_API_KEY` or a key for a compatible provider using `wrangler secret put`. You supply the key and manage the costs directly with your LLM provider.
+
+## Honest Limitation
+The quality and accuracy of the automated paper summarization depend entirely on the LLM you configure. It can make mistakes or omit important context. You should treat its output as a helpful starting draft, not a verified source.
 
 ## Contributing
-This is an open-source vessel in the Cocapn Fleet. The philosophy is fork-first: adapt it for your lab. Pull requests for clear improvements are welcome.
+Pull requests for clear, minor improvements are welcome. The primary intended use is for you to fork the repository and adapt it for your own needs.
 
 ## License
 MIT License.
 
-Superinstance & Lucineer (DiGennaro et al.).
+Superinstance and Lucineer (DiGennaro et al.).
 
----
-
-<div align="center">
-  <a href="https://the-fleet.casey-digennaro.workers.dev">The Fleet</a> • 
-  <a href="https://cocapn.ai">Cocapn</a>
-</div>
+<div style="text-align:center;padding:16px;color:#64748b;font-size:.8rem"><a href="https://the-fleet.casey-digennaro.workers.dev" style="color:#64748b">The Fleet</a> &middot; <a href="https://cocapn.ai" style="color:#64748b">Cocapn</a></div>
